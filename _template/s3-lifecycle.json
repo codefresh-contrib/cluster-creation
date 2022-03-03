@@ -1,0 +1,15 @@
+{
+    "Rules": [
+        {
+            "Prefix": "",
+            "Expiration": {
+                "Days": 30
+            },
+            "ID": "delete-old",
+            "Status": "Enabled",
+            "AbortIncompleteMultipartUpload": {
+                "DaysAfterInitiation": 15
+            }
+        }
+    ]
+}

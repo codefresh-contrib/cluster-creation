@@ -1,0 +1,30 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: ${cluster_name}
+patches:
+- path: ingress-patch.json
+  target:
+    group: apps
+    kind: Deployment
+    name: argo-server
+    version: v1
+resources:
+- ../../base
+- ingress.yaml
+#- artifact-repo.yaml
+# https://argoproj.github.io/argo-workflows/configure-artifact-repository/
+# https://argoproj.github.io/argo-workflows/workflow-controller-configmap/
+# https://argoproj.github.io/argo-workflows/workflow-controller-configmap.yaml
+patchesStrategicMerge:
+- |
+    apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: workflow-controller-configmap
+    data:
+      artifactRepository:  |
+        archiveLogs: true
+        s3:
+          bucket: ${cluster_name}
+          endpoint: s3.amazonaws.com
+          region: ${cluster_region}

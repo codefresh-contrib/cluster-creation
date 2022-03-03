@@ -1,0 +1,47 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+metadata:
+  name: ${cluster_name}
+  region: us-east-1
+managedNodeGroups:
+  - name: ${cluster_name}-ng
+    desiredCapacity: 2
+    minSize: 2
+    maxSize: 6
+    spot: true
+    # IPs per node https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-eni.html#AvailableIpPerENI (https://github.com/awslabs/amazon-eks-ami/blob/master/files/eni-max-pods.txt)
+    # Look into this: https://aws.amazon.com/blogs/containers/amazon-vpc-cni-increases-pods-per-node-limits/
+    instanceTypes:   # Spot pricing, us-east-1 (https://aws.amazon.com/ec2/spot/pricing/), all have 2 vCPU, 8GB RAM (t3s are burstable)
+      - "t3.large"   # $0.025 per Hour (intel)
+      - "t3a.large"  # $0.0226 per Hour (amd)
+      - "m6i.large"  # $0.0357 per Hour (intel)
+      - "m6a.large"  # $0.0357 per Hour (amd)
+      - "m5.large"   # $0.0396 per Hour (intel, ebs)
+      - "m5a.large"  # $0.0351 per Hour (amd, ebs)
+      - "m5d.large"  # $0.0348 per Hour (intel, local nvme)
+      - "m5ad.large" # $0.034 per Hour  (amd, local nvme)
+    volumeSize: 80
+    labels:
+      intent: apps
+    tags:
+      alpha.eksctl.io/cluster-name: ${cluster_name}
+      alpha.eksctl.io/nodegroup-name: ${cluster_name}-ng
+      owner: sales
+      # EC2 tags required for cluster-autoscaler auto-discovery
+      k8s.io/cluster-autoscaler/enabled: "true"
+      k8s.io/cluster-autoscaler/${cluster_name}: "owned"
+    iam:
+      attachPolicy:
+        Version: "2012-10-17"
+        Statement:
+        - Effect: Allow
+          Action:
+          - 's3:GetObject'
+          - 's3:PutObject'
+          Resource: 'arn:aws:s3:::${cluster_name}/*'
+      withAddonPolicies:
+        imageBuilder: true # ECR Access https://eksctl.io/usage/iam-policies/#image-builder-policy
+        autoScaler: true
+        externalDNS: true
+        certManager: true
+        ebs: true
