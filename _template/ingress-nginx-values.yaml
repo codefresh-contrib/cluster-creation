@@ -3,10 +3,13 @@ controller:
     targetPorts:
       http: http
       https: http
+    # Consider also these tweaks to allow getting real client IP in nginx
+    # https://github.com/kubernetes/ingress-nginx/blob/d16e0dec4865cbd5b937dbffb957423c308331c5/hack/manifest-templates/provider/aws/nlb-with-tls-termination/values.yaml
+    # https://github.com/kubernetes/ingress-nginx/blob/main/deploy/static/provider/aws/nlb-with-tls-termination/deploy.yaml#L334-L343
     annotations:
       service.beta.kubernetes.io/aws-load-balancer-ssl-cert: arn:aws:acm:XX-XXXX-X:XXXXXXXXX:certificate/XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXX
       service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "http"
       service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "https"
       service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: '3600'
-      # Use NLB since classic LBs dont support websockets
+      # Classic LBs don't support websockets, use NLB
       service.beta.kubernetes.io/aws-load-balancer-type: nlb
