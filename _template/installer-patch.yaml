@@ -28,3 +28,4 @@ patchesStrategicMerge:
           bucket: ${cluster_name}
           endpoint: s3.amazonaws.com
           region: ${cluster_region}
+          useSDKCreds: true
