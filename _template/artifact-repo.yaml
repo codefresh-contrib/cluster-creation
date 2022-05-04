@@ -4,6 +4,8 @@ metadata:
   annotations:
     workflows.argoproj.io/default-artifact-repository: default-v1
   name: artifact-repositories
+# https://argoproj.github.io/argo-workflows/executor_swagger/#s3artifact
+# https://argoproj.github.io/argo-workflows/configure-artifact-repository/#s3-compatible-artifact-repository-bucket-such-as-aws-gcs-minio-and-alibaba-cloud-oss
 data:
   default-v1: |
     archiveLogs: true
@@ -11,3 +13,4 @@ data:
       bucket: ${artifact_bucket}
       endpoint: s3.amazonaws.com
       region: ${cluster_region}
+      useSDKCreds: true
